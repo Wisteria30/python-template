@@ -1,0 +1,32 @@
+name: Setup
+description: 'Setup Python and Poetry'
+inputs:
+  python-version:
+    description: 'Version of python'
+    required: false
+    default: "3.11"
+  poetry-home:
+    description: 'Install directory of poetry'
+    required: false
+    default: /opt/poetry
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+          python-version: ${{ inputs.python-version }}
+
+    - name: Install poetry
+      run: |
+          export POETRY_HOME=${{ inputs.poetry-home }}
+          curl -sSL https://install.python-poetry.org/ | python - --version 1.4.2
+          ln -s $POETRY_HOME/bin/poetry /usr/local/bin/poetry
+          poetry config virtualenvs.create false
+      shell: bash
+
+    - name: Install dependencies
+      run: |
+          poetry lock
+          poetry install --no-ansi
+      shell: bash

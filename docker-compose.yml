@@ -1,0 +1,32 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile:  ./Dockerfile
+    container_name: python
+    env_file:
+      - .env
+    ports:
+      - 8088:8088
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: make run
+    depends_on:
+      - db
+
+  db:
+    image: ankane/pgvector:v0.5.0
+    ports:
+      - 5432:5432
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: app
+
+volumes:
+  db_volume:
